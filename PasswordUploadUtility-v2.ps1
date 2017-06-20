@@ -14,21 +14,9 @@
 #               Add Additional Properties for non-Windows accounts
 #
 #########################################################################
-# passwords.csv Mapping
-#
-# Password_name     Object Name
-# CPMUser           PasswordManager
-# Safe              Safe Name
-# Folder            Root
-# Password          NO_VALUE
-# DeviceType        Operating System
-# PolicyID          PlatformID
-# Address           Address (IP, DNS, FQDN)
-# UserName          Username
-##########################################################################
 
 ## FUNCTIONS FIRST!
-Function OpenFile-Dialog($initialDirectory)
+function OpenFile-Dialog($initialDirectory)
 {
     [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
     
@@ -39,7 +27,7 @@ Function OpenFile-Dialog($initialDirectory)
     $OpenFileDialog.filename
 }
 
-Function PASREST-Logon {
+function PASREST-Logon {
 
     # Declaration
     $webServicesLogon = "$Global:baseURL/PasswordVault/WebServices/auth/Cyberark/CyberArkAuthenticationService.svc/Logon"
@@ -105,6 +93,27 @@ function PASREST-AddAccount ([string]$Authorization,[string]$ObjectName,[string]
     }
 }
 
+function PASREST-Logoff ([string]$Authorization) {
+
+    # Declaration
+    $webServicesLogoff = "$Global:baseURL/PasswordVault/WebServices/auth/Cyberark/CyberArkAuthenticationService.svc/Logoff"
+
+    # Authorization
+    $headerParams = @{}
+    $headerParams.Add("Authorization",$Authorization)
+
+    # Execution
+    try {
+        $logoffResult = Invoke-RestMethod -Uri $webServicesLogoff -Method POST -ContentType "application/json" -Header $headerParams -ErrorVariable logoffResultErr
+        Return $true
+    }
+    catch {
+        Write-Host "StatusCode: " $_.Exception.Response.StatusCode.value__
+        Write-Host "StatusDescription: " $_.Exception.Response.StatusDescription
+        Write-Host "Response: " $_.Exception.Message
+        Return $false
+    }
+}
 
 ## DISABLE SSL VERIFICATION (THIS IS FOR DEV ONLY!)
 [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
@@ -136,16 +145,14 @@ $counter = 1
 foreach ($row in $csvRows) {
 
     # DEFINE VARIABLES FOR EACH VALUE
-    $objectName = $row.ObjectName
-    $cpmUser    = $row.CPMUser
-    $safe       = $row.Safe
-    $folder     = "Root"
-    $password   = $row.Password
-    $deviceType = $row.DeviceType
-    $platformID = $row.PlatformID
-    $address    = $row.Address
-    $username   = $row.Username
-    $reset      = $row.ResetImmediately
+    $objectName             = $row.ObjectName
+    $safe                   = $row.Safe
+    $password               = $row.Password
+    $platformID             = $row.PlatformID
+    $address                = $row.Address
+    $username               = $row.Username
+    $disableAutoMgmt        = $row.DisableAutoMgmt
+    $disableAutoMgmtReason  = $row.DisableAutoMgmtReason
 
     # CHECK FOR ACCOUNT ALREADY VAULTED
     $accountCheck = PASREST-GetAccount -Authorization $sessionID -Keywords [System.Web.HttpUtility]::UrlEncode($username) -Safe [System.Web.HttpUtility]::UrlEncode($safe)
@@ -158,6 +165,11 @@ foreach ($row in $csvRows) {
     if ($retVal -eq $false) { Write-Host "[ERROR] There was an error adding ${username}@${address} into the Vault." -ForegroundColor "Red"; break }
     else { $counter = $counter++; Write-Host "[INFO] [${counter}/${rowCount}] Added ${username}@${address} successfully." -ForegroundColor "DarkYellow" }
 }
+
+$logoffResult = PASREST-Logoff -Authorization $sessionID
+# If a value is returned, logoff was successful.
+if ($logoffResult -eq $true) {Write-Host "[INFO] Logoff completed successfully." -ForegroundColor DarkYellow}
+else {Write-Host "[ERROR] Logoff was not completed successfully.  Please logout manually using Authorization token: ${sessionID} or wait until PVWATimeout occurs." -ForegroundColor Red}
 
 Write-Host " "
 Write-Host "=====================================" -ForegroundColor "Yellow"
