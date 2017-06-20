@@ -33,7 +33,10 @@ function PASREST-Logon {
     $webServicesLogon = "$Global:baseURL/PasswordVault/WebServices/auth/Cyberark/CyberArkAuthenticationService.svc/Logon"
 
     # Authentication
-    $bodyParams = @{username = "$Global:apiUsername"; password = "$Global:apiPassword"} | ConvertTo-JSON
+    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Global:apiPassword)
+    $apiPasswordPT = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+    
+    $bodyParams = @{username = $Global:apiUsername; password = ($apiPasswordPT)} | ConvertTo-JSON
 
     # Execution
     try {
@@ -45,28 +48,6 @@ function PASREST-Logon {
         Write-Host "StatusDescription: " $_.Exception.Response.StatusDescription
         Write-Host "Response: " $_.Exception.Message
         Return $false
-    }
-}
-
-function PASREST-GetAccount ([string]$Authorization, [string]$Keywords, [string]$Safe) {
-
-    # Declaration
-    $webServicesGA = "$Global:baseURL/PasswordVault/WebServices/PIMServices.svc/Accounts?Keywords=$Keywords&Safe=$Safe"
-
-    # Authorization
-    $headerParams = @{}
-    $headerParams.Add("Authorization",$Authorization)
-
-    # Execution
-    try {
-        $getAccountResult = Invoke-RestMethod -Uri $webServicesGA -Method GET -ContentType "application/json" -Headers $headerParams -ErrorVariable getAccountResultErr
-        return $getAccountResult
-    }
-    catch {
-        Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__
-        Write-Host "StatusDescription:" $_.Exception.Response.StatusDescription
-        Write-Host "Response:" $_.Exception.Message
-        return $false
     }
 }
 
@@ -131,6 +112,7 @@ $csvPath = OpenFile-Dialog($Env:CSIDL_DEFAULT_DOWNLOADS)
 
 ## LOGON TO CYBERARK WEB SERVICES
 $sessionID = PASREST-Logon
+Write-Host "Session ID: ${sessionID}"
 # Error Handling for Logon
 if ($sessionID -eq $false) { Write-Host "[ERROR] There was an error logging into the Vault." -ForegroundColor "Red"; break }
 else { Write-Host "[INFO] Logon completed successfully." -ForegroundColor "DarkYellow" }
@@ -138,7 +120,7 @@ else { Write-Host "[INFO] Logon completed successfully." -ForegroundColor "DarkY
 ## IMPORT CSV
 $csvRows = Import-Csv -Path $csvPath
 # Count the number of rows in the CSV
-$rowCount = $csvRows.Count()
+$rowCount = $csvRows.Count
 $counter = 1
 
 ## STEP THROUGH EACH CSV ROW
@@ -151,18 +133,23 @@ foreach ($row in $csvRows) {
     $platformID             = $row.PlatformID
     $address                = $row.Address
     $username               = $row.Username
-    $disableAutoMgmt        = $row.DisableAutoMgmt
-    $disableAutoMgmtReason  = $row.DisableAutoMgmtReason
 
-    # CHECK FOR ACCOUNT ALREADY VAULTED
-    $accountCheck = PASREST-GetAccount -Authorization $sessionID -Keywords [System.Web.HttpUtility]::UrlEncode($username) -Safe [System.Web.HttpUtility]::UrlEncode($safe)
-    # If account is already vaulted, do not vault and break to next row.
-    if ($accountCheck -ne $false) { Write-Host "[ERROR] The account ${username} at the address ${address} is already vaulted." -ForegroundColor "Red"; break }
+    # If DisableAutoMgmt is yes or true, disable it.  Otherwise, ignore.
+    if ($row.DisableAutoMgmt -eq "yes" -or $row.DisableAutoMgmt -eq "true") {
+        $disableAutoMgmt = $true
+    } else {
+        $disableAutoMgmt = $false
+    }
+    if ($disableAutoMgmt -eq $true) {
+        $disableAutoMgmtReason = $row.DisableAutoMgmtReason
+    } else {
+        $disableAutoMgmtReason = ""
+    }
 
     # ADD ACCOUNT TO VAULT
     $addResult = PASREST-AddAccount -Authorization $sessionID -ObjectName $objectName -Safe $safe -PlatformID $platformID -Address $address -Username $username -Password $password -DisableAutoMgmt $disableAutoMgmt -DisableAutoMgmtReason $disableAutoMgmtReason
     # If nothing is returned, there was an error and it will break to next row.
-    if ($retVal -eq $false) { Write-Host "[ERROR] There was an error adding ${username}@${address} into the Vault." -ForegroundColor "Red"; break }
+    if ($addResult -eq $false) { Write-Host "[ERROR] There was an error adding ${username}@${address} into the Vault." -ForegroundColor "Red"; break }
     else { $counter = $counter++; Write-Host "[INFO] [${counter}/${rowCount}] Added ${username}@${address} successfully." -ForegroundColor "DarkYellow" }
 }
 
