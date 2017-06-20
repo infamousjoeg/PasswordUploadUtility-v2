@@ -8,11 +8,13 @@ Thank you for attending the **REST for the Rest of Us** breakout session!
 
 ## Usage
 
-```git clone https://github.com/infamousjoeg/PasswordUploadUtility-v2.git```
+Download the ZIP file or ```git clone``` to a directory.
 
-```cmd.exe powershell```
+Open _passwords.csv_ and begin adding your account information.  Acceptable values for DisableAutoMgmt are yes or true.  Anything else will be considered a no.
 
-```cd PasswordUploadUtility-v2```
+Start > Run ```powershell```
+
+```cd``` to the directory _PasswordUploadUtility-v2.ps1_ is located.
 
 ```.\PasswordUploadUtility-v2.ps1```
 
