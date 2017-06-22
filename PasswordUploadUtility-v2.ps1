@@ -59,7 +59,7 @@ function PASREST-AddAccount ([string]$Authorization,[string]$ObjectName,[string]
     # Authorization
     $headerParams = @{}
     $headerParams.Add("Authorization",$Authorization)
-    $bodyParams = @{account = @{safe = $Safe; platformID = $PlatformID; address = $Address; accountName = $ObjectName; password = $Password; username = $Username; disableAutoMgmt = $DisableAutoMgmt; disableAutoMgmtReason = $DisableAutoMgmtReason}} | ConvertTo-JSON -Depth 2
+    $bodyParams = @{account = @{safe = $Safe; platformID = $PlatformID.Replace(" ",""); address = $Address; accountName = $ObjectName; password = $Password; username = $Username; disableAutoMgmt = $DisableAutoMgmt; disableAutoMgmtReason = $DisableAutoMgmtReason}} | ConvertTo-JSON -Depth 2
 
     # Execution
     try {
@@ -113,6 +113,7 @@ $csvPath = OpenFile-Dialog($Env:CSIDL_DEFAULT_DOWNLOADS)
 ## LOGON TO CYBERARK WEB SERVICES
 $sessionID = PASREST-Logon
 Write-Host "Session ID: ${sessionID}"
+
 # Error Handling for Logon
 if ($sessionID -eq $false) { Write-Host "[ERROR] There was an error logging into the Vault." -ForegroundColor "Red"; break }
 else { Write-Host "[INFO] Logon completed successfully." -ForegroundColor "DarkYellow" }
@@ -121,10 +122,13 @@ else { Write-Host "[INFO] Logon completed successfully." -ForegroundColor "DarkY
 $csvRows = Import-Csv -Path $csvPath
 # Count the number of rows in the CSV
 $rowCount = $csvRows.Count
-$counter = 1
+$counter = 0
 
 ## STEP THROUGH EACH CSV ROW
 foreach ($row in $csvRows) {
+
+    # INCREMENT COUNTER
+    $counter++
 
     # DEFINE VARIABLES FOR EACH VALUE
     $objectName             = $row.ObjectName
@@ -150,7 +154,7 @@ foreach ($row in $csvRows) {
     $addResult = PASREST-AddAccount -Authorization $sessionID -ObjectName $objectName -Safe $safe -PlatformID $platformID -Address $address -Username $username -Password $password -DisableAutoMgmt $disableAutoMgmt -DisableAutoMgmtReason $disableAutoMgmtReason
     # If nothing is returned, there was an error and it will break to next row.
     if ($addResult -eq $false) { Write-Host "[ERROR] There was an error adding ${username}@${address} into the Vault." -ForegroundColor "Red"; break }
-    else { $counter = $counter++; Write-Host "[INFO] [${counter}/${rowCount}] Added ${username}@${address} successfully." -ForegroundColor "DarkYellow" }
+    else { Write-Host "[INFO] [${counter}/${rowCount}] Added ${username}@${address} successfully." -ForegroundColor "DarkYellow" }
 }
 
 $logoffResult = PASREST-Logoff -Authorization $sessionID
