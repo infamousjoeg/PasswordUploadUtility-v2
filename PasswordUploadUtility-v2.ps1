@@ -54,6 +54,27 @@ function PASREST-Logon {
     }
 }
 
+function PASREST-GetAccount ([string]$Authorization,[string]$Address,[string]$Username) {
+    # Declaration
+    $webServicesGetAccount = "$Global:baseURL/PasswordVault/WebServices/PIMServices.svc/Accounts"
+
+    # Authorization
+    $headerParams = @{}
+    $headerParams.Add("Authorization",$Authorization)
+
+    # Execution
+    try {
+        $getAccountResult = Invoke-RestMethod -Uri "$($webServicesGetAccount)?Keywords=$($Address),$($Username)" -Method GET -Header $headerParams -ErrorVariable getAccountResultErr
+        return $getAccountResult
+    }
+    catch {
+        Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__
+        Write-Host "StatusDescription:" $_.Exception.Response.StatusDescription
+        Write-Host "Response:" $_.Exception.Message
+        return $false
+    }
+}
+
 function PASREST-AddAccount ([string]$Authorization,[string]$ObjectName,[string]$Safe,[string]$PlatformID,[string]$Address,[string]$Username,[string]$Password,[boolean]$DisableAutoMgmt,[string]$DisableAutoMgmtReason) {
 
     # Declaration
@@ -151,6 +172,14 @@ foreach ($row in $csvRows) {
         $disableAutoMgmtReason = $row.DisableAutoMgmtReason
     } else {
         $disableAutoMgmtReason = ""
+    }
+
+    #CHECK IF ACCOUNT ALREADY EXISTS IN VAULT
+    $getResult = PASREST-GetAccount -Authorization $sessionID -Address $address -Username $username
+    if ($getResult -ne $false) {
+        $getResultConv = $getResult | ConvertFrom-Json
+        # If results are returned matching the specific username and address combination, break to the next row.
+        if([int]$getResultConv.Count -gt 0) { Write-Host "[ERROR] Username ${username}@${address} already exists in the Vault." -ForegroundColor "Red"; break }
     }
 
     # ADD ACCOUNT TO VAULT
