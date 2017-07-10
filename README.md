@@ -1,14 +1,19 @@
 # Password Upload Utility v2
+## PUU 2
 
 [![CyberArk Ready](https://img.shields.io/badge/CyberArk-ready-blue.svg)](https://www.cyberark.com)[![Build Status](http://poop.joe-garcia.com:8080/buildStatus/icon?job=PasswordUploadUtility-v2)](https://github.com/infamousjoeg/PasswordUploadUtility-v2/)[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/mit-license.php)
-
-[![GitHub forks](https://img.shields.io/github/forks/badges/shields.svg?style=social&label=Fork)](https://github.com/infamousjoeg/PasswordUploadUtility-v2/fork)[![GitHub stars](https://img.shields.io/github/stars/badges/shields.svg?style=social&label=Star)](https://github.com/infamousjoeg/PasswordUploadUtility-v2)[![GitHub watchers](https://img.shields.io/github/watchers/badges/shields.svg?style=social&label=Watch)](https://github.com/infamousjoeg/PasswordUploadUtility-v2/subscription)[![GitHub followers](https://img.shields.io/github/followers/espadrine.svg?style=social&label=Follow)](https://github.com/infamousjoeg)
 
 Updated Password Upload Utility utilizing the REST API instead of an outdated and restricted version of PACLI.
 
 ## WELCOME CYBERARK IMPACT 2017 ATTENDEES!
 
 Thank you for attending the **REST for the Rest of Us** breakout session!
+
+Love UNIX?  Us too!  [PUU 2 for Bash](https://github.com/infamousjoeg/PasswordUploadUtility-v2-bash)
+
+## Requirements
+
+PowerShell version 3.0 or above
 
 ## Usage
 
@@ -26,7 +31,9 @@ Start > Run ```powershell```
 
 Available at [GitHub Gists](https://gist.github.com/infamousjoeg/9fd1ae60cdea88ac18dbbc49cf2bfe34)
 
+[PSPete’s psPAS PowerShell Module on GitHub](https://github.com/pspete/psPAS)
+
 ## TODO
 
-* Add Bulk Change Method
+* Add Bulk Change Switch
 * Add Additional Properties for non-Windows accounts
