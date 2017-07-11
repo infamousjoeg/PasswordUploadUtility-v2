@@ -9,7 +9,7 @@ Updated Password Upload Utility utilizing the REST API instead of an outdated an
 
 Thank you for attending the **REST for the Rest of Us** breakout session!
 
-Love UNIX?  Us too!  [PUU 2 for Bash](https://github.com/infamousjoeg/PasswordUploadUtility-v2-bash)
+Love UNIX?  Us too!  [PUU 2 for Bash](https://github.com/infamousjoeg/PasswordUploadUtility-bash-v2)
 
 ## Requirements
 
