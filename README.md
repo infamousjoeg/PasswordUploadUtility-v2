@@ -9,6 +9,8 @@ Updated Password Upload Utility utilizing the REST API instead of an outdated an
 
 Thank you for attending the **REST for the Rest of Us** breakout session!
 
+Did you miss my awesome presentation?  [Check it out on SlideShare!](https://www.slideshare.net/JoeGarciaCISSP/cyberark-impact-2017-rest-for-the-rest-of-us)
+
 Love UNIX?  Us too!  [PUU 2 for Bash](https://github.com/infamousjoeg/PasswordUploadUtility-bash-v2)
 
 ## Requirements
