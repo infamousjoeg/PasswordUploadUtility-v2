@@ -15,6 +15,9 @@
 #
 #########################################################################
 
+## Use TLS 1.2 instead of default 1.0
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 ## FUNCTIONS FIRST!
 function OpenFile-Dialog($initialDirectory)
 {
