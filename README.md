@@ -15,6 +15,11 @@ Did you miss my awesome presentation?  [Check it out on SlideShare!](https://www
 
 Love UNIX?  Us too!  [PUU 2 for Bash](https://github.com/infamousjoeg/PasswordUploadUtility-bash-v2)
 
+### Recently Added
+
+* Get-Account will now confirm the Add-Account query did add the account!
+* Changed out breaks to stop bad practice
+
 ## Requirements
 
 PowerShell version 3.0 or above
