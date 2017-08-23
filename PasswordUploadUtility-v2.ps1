@@ -51,17 +51,21 @@ function PASREST-Logon {
     }
 }
 
-function PASREST-GetAccount ([string]$Authorization,[string]$Address,[string]$Username) {
+function PASREST-GetAccount ([string]$Authorization,[string]$Address,[string]$Username, [string]$Safe="") {
     # Declaration
     $webServicesGetAccount = "$Global:baseURL/PasswordVault/WebServices/PIMServices.svc/Accounts"
 
     # Authorization
     $headerParams = @{}
     $headerParams.Add("Authorization",$Authorization)
-
+    $requestURI = "$($webServicesGetAccount)?Keywords=$($Address),$($Username)"
+    if ($safe -ne "") {
+        $requestURI = "$($requestURI)&Safe=$($Safe)"
+    }
     # Execution
+    Write-Host "Request URI: $($requestURI)"
     try {
-        $getAccountResult = Invoke-RestMethod -Uri "$($webServicesGetAccount)?Keywords=$($Address),$($Username)" -Method GET -Header $headerParams -ErrorVariable getAccountResultErr
+        $getAccountResult = Invoke-RestMethod -Uri "$($requestURI)" -Method GET -Header $headerParams -ErrorVariable getAccountResultErr
         return $getAccountResult
     }
     catch {
@@ -172,17 +176,16 @@ foreach ($row in $csvRows) {
     }
 
     #CHECK IF ACCOUNT ALREADY EXISTS IN VAULT
-    $getResult = PASREST-GetAccount -Authorization $sessionID -Address $address -Username $username
+    $getResult = PASREST-GetAccount -Authorization $sessionID -Address $address -Username $username -Safe $safe
     if ($getResult -ne $false) {
-        $getResultConv = $getResult | ConvertFrom-Json
         # If results are returned matching the specific username and address combination, break to the next row.
-        if([int]$getResultConv.Count -gt 0) { Write-Host "[ERROR] Username ${username}@${address} already exists in the Vault." -ForegroundColor "Red"; break }
+        if([int]$getResult.Count -gt 0) { Write-Host "[ERROR] Username ${username}@${address} already exists in the Vault." -ForegroundColor "Red"; continue }
     }
 
     # ADD ACCOUNT TO VAULT
     $addResult = PASREST-AddAccount -Authorization $sessionID -ObjectName $objectName -Safe $safe -PlatformID $platformID -Address $address -Username $username -Password $password -DisableAutoMgmt $disableAutoMgmt -DisableAutoMgmtReason $disableAutoMgmtReason
     # If nothing is returned, there was an error and it will break to next row.
-    if ($addResult -eq $false) { Write-Host "[ERROR] There was an error adding ${username}@${address} into the Vault." -ForegroundColor "Red"; break }
+    if ($addResult -eq $false) { Write-Host "[ERROR] There was an error adding ${username}@${address} into the Vault." -ForegroundColor "Red"; continue }
     else { Write-Host "[INFO] [${counter}/${rowCount}] Added ${username}@${address} successfully." -ForegroundColor "DarkYellow" }
 }
 
