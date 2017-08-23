@@ -1,6 +1,8 @@
 # Password Upload Utility v2
 ## PUU 2
 
+**_This is not supported by CyberArk.  It is an open source community project._**
+
 [![CyberArk Ready](https://img.shields.io/badge/CyberArk-ready-blue.svg)](https://www.cyberark.com)[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/mit-license.php)
 
 Updated Password Upload Utility utilizing the REST API instead of an outdated and restricted version of PACLI.
