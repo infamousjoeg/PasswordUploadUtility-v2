@@ -1,7 +1,11 @@
 # Password Upload Utility v2
 ## PUU 2
 
-**_This is not supported by CyberArk.  It is an open source community project._**
+---
+
+### **_This is not supported by CyberArk.  It is an open source community project._**
+
+---
 
 [![CyberArk Ready](https://img.shields.io/badge/CyberArk-ready-blue.svg)](https://www.cyberark.com)[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/infamousjoeg/PasswordUploadUtility-v2/master/LICENSE.md)
 [![GitHub issues](https://img.shields.io/github/issues/infamousjoeg/PasswordUploadUtility-v2.svg)](https://github.com/infamousjoeg/PasswordUploadUtility-v2/issues)[![GitHub stars](https://img.shields.io/github/stars/infamousjoeg/PasswordUploadUtility-v2.svg)](https://github.com/infamousjoeg/PasswordUploadUtility-v2/stargazers)
