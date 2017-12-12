@@ -179,11 +179,11 @@ foreach ($row in $csvRows) {
     }
 
     #CHECK IF ACCOUNT ALREADY EXISTS IN VAULT
-    $getResult = PASREST-GetAccount -Authorization $sessionID -Address $address -Username $username -Safe $safe
-    if ($getResult -ne $false) {
-        # If results are returned matching the specific username and address combination, break to the next row.
-        if([int]$getResult.Count -le 0) { Write-Host "[ERROR] Username ${username}@${address} already exists in the Vault." -ForegroundColor "Red"; continue }
-    }
+#    $getResult = PASREST-GetAccount -Authorization $sessionID -Address $address -Username $username -Safe $safe
+#    if ($getResult -ne $false) {
+#        # If results are returned matching the specific username and address combination, break to the next row.
+#        if([int]$getResult.Count -le 0) { Write-Host "[ERROR] Username ${username}@${address} already exists in the Vault." -ForegroundColor "Red"; continue }
+#    }
 
     # ADD ACCOUNT TO VAULT
     $addResult = PASREST-AddAccount -Authorization $sessionID -ObjectName $objectName -Safe $safe -PlatformID $platformID -Address $address -Username $username -Password $password -DisableAutoMgmt $disableAutoMgmt -DisableAutoMgmtReason $disableAutoMgmtReason
