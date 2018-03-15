@@ -1,0 +1,23 @@
+PUUv2 Changelog:
+
+Edited:
+	line 39: commented out as it was causing errors in my environment and I couldn't get it resolved. Can uncomment if desired for newer TLS.
+	line 59-60: commented out LDAP password
+	line 63-64: added 2-factor Radius auth
+	line 67: added useRadiusAuthentication = 'True' to leverage 2-factor instead of AD auth
+	line 108: added additional params to function
+	line 118-125: sends different parameters based off the attributes that are populated in the spreadsheet
+					if both database and logondomain are populated in the same row then it will only send database due to order of if else statement. Could adjust if desired.
+	line 128: added to convert bodyParams to appropriate JSON syntax
+	line 131: added Write-Host $bodyParams to be used for debugging. Throws up the JSON on the screen to check syntax, uncomment when needed
+	line 177: commented out apiPassword in favor of 2 factor auth
+	line 207: moved the "Replace(" ","") to remove spaces from the platform ID to this line just so the
+	line 210-212: added additional parameters for AD/oracle accounts
+	line 230: updated the if/$getResult count to be "-gt 0" otherwise it would never add an account for me. Since if it counts something that is the same username/address then the count would be 1
+	line 235-246: added if else statement for different types of accounts
+
+BUG: If multiple account types (e.g., Oracle and AD) are in the same import file, then the additional properties (Port, LogonDomain, Database) can show up on accounts as artifacts.
+    Example: if row two has an account with Port/Database populated, then row 3 might also have port and database get populated, even if it is blank. I am not sure why, maybe a caching issue?
+    Workaround: just use separate import files for different types of accounts (1 file for Oracle, 1 for AD, 1 for local, etc)
+
+TODO: add parameter for "Limit Domain Access To"
